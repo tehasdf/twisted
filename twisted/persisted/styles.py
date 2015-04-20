@@ -8,14 +8,18 @@
 Different styles of persisted objects.
 """
 
+from twisted.python.compat import _PY3
+
 # System Imports
 import types
-import copyreg
+if _PY3:
+    import copyreg
+else:
+    import copy_reg as copyreg
 import copy
 import inspect
 import sys
 
-from twisted.python.compat import _PY3
 
 if _PY3:
     from io import BytesIO as StringIO

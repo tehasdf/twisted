@@ -767,8 +767,7 @@ class Process(_BaseProcess):
         # of fdmap, i.e. fdmap.values() )
 
         if debug: print >>errfd, "fdmap", fdmap
-        childlist = fdmap.keys()
-        childlist.sort()
+        childlist = sorted(fdmap.keys())
 
         for child in childlist:
             target = fdmap[child]
