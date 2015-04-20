@@ -10,15 +10,20 @@ Different styles of persisted objects.
 
 # System Imports
 import types
-import copy_reg
+import copyreg
 import copy
 import inspect
 import sys
 
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
+from twisted.python.compat import _PY3
+
+if _PY3:
+    from io import BytesIO as StringIO
+else:
+    try:
+        import cStringIO as StringIO
+    except ImportError:
+        import StringIO
 
 # Twisted Imports
 from twisted.python import log
@@ -30,7 +35,7 @@ oldModules = {}
 ## be registerable...
 
 def pickleMethod(method):
-    'support function for copy_reg to pickle method refs'
+    'support function for copyreg to pickle method refs'
     return unpickleMethod, (method.im_func.__name__,
                              method.im_self,
                              method.im_class)
@@ -38,7 +43,7 @@ def pickleMethod(method):
 def unpickleMethod(im_name,
                     im_self,
                     im_class):
-    'support function for copy_reg to unpickle method refs'
+    'support function for copyreg to unpickle method refs'
     try:
         unbound = getattr(im_class,im_name)
         if im_self is None:
@@ -58,16 +63,16 @@ def unpickleMethod(im_name,
         bound = types.MethodType(unbound.im_func, im_self, im_self.__class__)
         return bound
 
-copy_reg.pickle(types.MethodType,
+copyreg.pickle(types.MethodType,
                 pickleMethod,
                 unpickleMethod)
 
 def pickleModule(module):
-    'support function for copy_reg to pickle module refs'
+    'support function for copyreg to pickle module refs'
     return unpickleModule, (module.__name__,)
 
 def unpickleModule(name):
-    'support function for copy_reg to unpickle module refs'
+    'support function for copyreg to unpickle module refs'
     if name in oldModules:
         log.msg("Module has moved: %s" % name)
         name = oldModules[name]
@@ -75,12 +80,12 @@ def unpickleModule(name):
     return __import__(name,{},{},'x')
 
 
-copy_reg.pickle(types.ModuleType,
+copyreg.pickle(types.ModuleType,
                 pickleModule,
                 unpickleModule)
 
 def pickleStringO(stringo):
-    'support function for copy_reg to pickle StringIO.OutputTypes'
+    'support function for copyreg to pickle StringIO.OutputTypes'
     return unpickleStringO, (stringo.getvalue(), stringo.tell())
 
 def unpickleStringO(val, sek):
@@ -90,7 +95,7 @@ def unpickleStringO(val, sek):
     return x
 
 if hasattr(StringIO, 'OutputType'):
-    copy_reg.pickle(StringIO.OutputType,
+    copyreg.pickle(StringIO.OutputType,
                     pickleStringO,
                     unpickleStringO)
 
@@ -104,7 +109,7 @@ def unpickleStringI(val, sek):
 
 
 if hasattr(StringIO, 'InputType'):
-    copy_reg.pickle(StringIO.InputType,
+    copyreg.pickle(StringIO.InputType,
                 pickleStringI,
                 unpickleStringI)
 

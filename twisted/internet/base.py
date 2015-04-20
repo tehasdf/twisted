@@ -17,6 +17,7 @@ from heapq import heappush, heappop, heapify
 
 import traceback
 
+from twisted.python.compat import unicode
 from twisted.internet.interfaces import IReactorCore, IReactorTime, IReactorThreads
 from twisted.internet.interfaces import IResolverSimple, IReactorPluggableResolver
 from twisted.internet.interfaces import IConnector, IDelayedCall
@@ -895,7 +896,7 @@ class ReactorBase(object):
                     "reactor.spawnProcess should be str, not unicode.",
                     category=DeprecationWarning,
                     stacklevel=4)
-            if isinstance(arg, str) and '\0' not in arg:
+            if isinstance(arg, bytes) and b'\0' not in arg:
                 return arg
             return None
 
@@ -914,7 +915,7 @@ class ReactorBase(object):
         outputEnv = None
         if env is not None:
             outputEnv = {}
-            for key, val in env.iteritems():
+            for key, val in env.items():
                 key = argChecker(key)
                 if key is None:
                     raise TypeError("Environment contains a non-string key")

@@ -48,10 +48,9 @@ unixEnabled = (platformType == 'posix')
 processEnabled = False
 if unixEnabled:
     from twisted.internet import fdesc
-    # Enable on Python 3 in ticket #5987:
-    if not _PY3:
-        from twisted.internet import process, _signals
-        processEnabled = True
+
+    from twisted.internet import process, _signals
+    processEnabled = True
 
 
 if platform.isWindows():
