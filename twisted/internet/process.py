@@ -9,7 +9,7 @@ Do NOT use this module directly - use reactor.spawnProcess() instead.
 
 Maintainer: Itamar Shtull-Trauring
 """
-
+from __future__ import print_function
 # System Imports
 import gc, os, sys, stat, traceback, select, signal, errno
 
@@ -766,14 +766,14 @@ class Process(_BaseProcess):
         # be moved to their appropriate positions in the child (the targets
         # of fdmap, i.e. fdmap.values() )
 
-        if debug: print >>errfd, "fdmap", fdmap
+        if debug: print("fdmap", fdmap, file=errfd)
         childlist = sorted(fdmap.keys())
 
         for child in childlist:
             target = fdmap[child]
             if target == child:
                 # fd is already in place
-                if debug: print >>errfd, "%d already in place" % target
+                if debug: print("%d already in place" % target, file=errfd)
                 fdesc._unsetCloseOnExec(child)
             else:
                 if child in fdmap.values():
@@ -781,14 +781,14 @@ class Process(_BaseProcess):
                     # still needs the fd it wants to target. We must preserve
                     # that old fd by duping it to a new home.
                     newtarget = os.dup(child) # give it a safe home
-                    if debug: print >>errfd, "os.dup(%d) -> %d" % (child,
-                                                                   newtarget)
+                    if debug: print("os.dup(%d) -> %d" % (child, newtarget),
+                                                                file=errfd)
                     os.close(child) # close the original
                     for c, p in fdmap.items():
                         if p == child:
                             fdmap[c] = newtarget # update all pointers
                 # now it should be available
-                if debug: print >>errfd, "os.dup2(%d,%d)" % (target, child)
+                if debug: print("os.dup2(%d,%d)" % (target, child), file=errfd)
                 os.dup2(target, child)
 
         # At this point, the child has everything it needs. We want to close
@@ -804,7 +804,7 @@ class Process(_BaseProcess):
             if not fd in old:
                 if not fd in fdmap.keys():
                     old.append(fd)
-        if debug: print >>errfd, "old", old
+        if debug: print("old", old, file=errfd)
         for fd in old:
             os.close(fd)
 
