@@ -89,7 +89,7 @@ def latestClass(oldClass):
         newClass.__bases__ = tuple(newBases)
         return newClass
     except TypeError:
-        if newClass.__module__ == "__builtin__":
+        if newClass.__module__ in ("__builtin__", "builtins"):
             # __builtin__ members can't be reloaded sanely
             return newClass
         ctor = getattr(newClass, '__metaclass__', type)
