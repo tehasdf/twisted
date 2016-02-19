@@ -19,6 +19,21 @@ from twisted.python import log, reflect
 
 lastRebuild = time.time()
 
+_ClassType = getattr(types, 'ClassType', None)
+def _isClassType(t):
+    """Compare to types.ClassType in a py2/3-compatible way
+
+    Python 2 used comparison to types.ClassType to check for old-style classes.
+    Python 3 has no concept of old-style classes, so if ClassType doesn't exist,
+    it can't be an old-style class - return False in that case.
+
+    Note that the type() of new-style classes is NOT ClassType, and so this
+    should return False for new-style classes in python 2 as well.
+    """
+    if _ClassType is None:
+        return False
+    return t == _ClassType
+
 
 class Sensitive:
     """
@@ -56,7 +71,7 @@ class Sensitive:
             # Kick it, if it's out of date.
             getattr(anObject, 'nothing', None)
             return anObject
-        elif t == types.ClassType:
+        elif _isClassType(t):
             return latestClass(anObject)
         else:
             log.msg('warning returning anObject!')
@@ -153,9 +168,9 @@ def rebuild(module, doLog=1):
     values = {}
     if doLog:
         log.msg('  (scanning %s): ' % str(module.__name__))
-    ClassType = getattr(types, 'ClassType', None)
+
     for k, v in d.items():
-        if ClassType is not None and type(v) == ClassType:
+        if _isClassType(type(v)):
             # Failure condition -- instances of classes with buggy
             # __hash__/__cmp__ methods referenced at the module level...
             if v.__module__ == module.__name__:
@@ -243,7 +258,7 @@ def rebuild(module, doLog=1):
             except Exception:
                 continue
             if fromOldModule(v):
-                if type(v) == types.ClassType:
+                if _isClassType(type(v)):
                     if doLog:
                         log.logfile.write("c")
                         log.logfile.flush()
@@ -257,7 +272,7 @@ def rebuild(module, doLog=1):
                 setattr(mod, k, nv)
             else:
                 # Replace bases of non-module classes just to be sure.
-                if type(v) == types.ClassType:
+                if _isClassType(type(v)):
                     for base in v.__bases__:
                         if fromOldModule(base):
                             latestClass(v)
