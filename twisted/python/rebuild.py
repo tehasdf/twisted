@@ -108,7 +108,11 @@ def latestClass(oldClass):
         if newClass.__module__ in ("__builtin__", "builtins"):
             # __builtin__ members can't be reloaded sanely
             return newClass
-        ctor = getattr(newClass, '__metaclass__', type)
+
+        ctor = type(newClass)
+        # ctor is the metaclass in both py2 and 3, except if it was old-style
+        if _isClassType(ctor):
+            ctor = getattr(newClass, '__metaclass__', type)
         return ctor(newClass.__name__, tuple(newBases), dict(newClass.__dict__))
 
 
