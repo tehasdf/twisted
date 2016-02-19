@@ -250,3 +250,5 @@ class NewStyleTests(unittest.TestCase):
         # Moving from new-style class to old-style should fail.
         self.assertRaises(TypeError, rebuild.updateInstance, inst)
 
+    if sys.version_info >= (3, 0):
+        test_instanceSlots.skip = 'Python 3 does not support old-style classes'
