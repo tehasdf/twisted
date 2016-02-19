@@ -69,7 +69,7 @@ def latestFunction(oldFunc):
     """
     # This may be CPython specific, since I believe jython instantiates a new
     # module upon reload.
-    dictID = id(oldFunc.func_globals)
+    dictID = id(oldFunc.__globals__)
     module = _modDictIDMap.get(dictID)
     if module is None:
         return oldFunc
@@ -163,7 +163,7 @@ def rebuild(module, doLog=1):
                     log.logfile.write("c")
                     log.logfile.flush()
         elif type(v) == types.FunctionType:
-            if v.func_globals is module.__dict__:
+            if v.__globals__ is module.__dict__:
                 functions[v] = 1
                 if doLog:
                     log.logfile.write("f")
