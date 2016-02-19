@@ -8,6 +8,7 @@
 """
 
 # System Imports
+import imp
 import sys
 import types
 import time
@@ -187,7 +188,7 @@ def rebuild(module, doLog=1):
         log.msg('  (reload   %s)' % str(module.__name__))
 
     # Boom.
-    reload(module)
+    imp.reload(module)
     # Make sure that my traceback printing will at least be recent...
     linecache.clearcache()
 
