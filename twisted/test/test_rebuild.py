@@ -145,6 +145,8 @@ class RebuildTests(unittest.TestCase):
         from twisted.spread import banana
         rebuild.latestClass(banana.Banana)
 
+    if sys.version_info >= (3, 0):
+        testBananaInteraction.skip = 'twisted.spread.banana is not ported yet'
 
     def test_hashException(self):
         """
