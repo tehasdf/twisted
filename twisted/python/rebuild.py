@@ -152,8 +152,9 @@ def rebuild(module, doLog=1):
     values = {}
     if doLog:
         log.msg('  (scanning %s): ' % str(module.__name__))
+    ClassType = getattr(types, 'ClassType', None)
     for k, v in d.items():
-        if type(v) == types.ClassType:
+        if ClassType is not None and type(v) == ClassType:
             # Failure condition -- instances of classes with buggy
             # __hash__/__cmp__ methods referenced at the module level...
             if v.__module__ == module.__name__:
